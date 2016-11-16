@@ -1,0 +1,120 @@
+{
+	"groups": [
+		{
+			"keys": "description_json,error_png,outside_sc_shrub_png,outside_bg_grass_png,Actor1_03_png,Actor1_02_png,Actor1_01_png,Actor1_13_png,Actor1_11_png,Actor1_12_png,actor1_05_png,actor1_06_png,Actor1_07_png,Actor1_08_png,Actor1_09_png,Actor1_10_png,Actor1_jpg,Balloon_questionMark_png,Balloon_questionMark_gray_png,Balloon_exclamation_png,Balloon_exclamation_gray_png,empty_png",
+			"name": "preload"
+		}
+	],
+	"resources": [
+		{
+			"url": "config/description.json",
+			"type": "json",
+			"name": "description_json"
+		},
+		{
+			"url": "assets/error.png",
+			"type": "image",
+			"name": "error_png"
+		},
+		{
+			"url": "assets/outside_bg_grass.png",
+			"type": "image",
+			"name": "outside_bg_grass_png"
+		},
+		{
+			"url": "assets/outside_sc_shrub.png",
+			"type": "image",
+			"name": "outside_sc_shrub_png"
+		},
+		{
+			"url": "assets/Actor1_03.png",
+			"type": "image",
+			"name": "Actor1_03_png"
+		},
+		{
+			"url": "assets/Actor1_02.png",
+			"type": "image",
+			"name": "Actor1_02_png"
+		},
+		{
+			"url": "assets/Actor1_01.png",
+			"type": "image",
+			"name": "Actor1_01_png"
+		},
+		{
+			"url": "assets/Actor1_13.png",
+			"type": "image",
+			"name": "Actor1_13_png"
+		},
+		{
+			"url": "assets/Actor1_11.png",
+			"type": "image",
+			"name": "Actor1_11_png"
+		},
+		{
+			"url": "assets/Actor1_12.png",
+			"type": "image",
+			"name": "Actor1_12_png"
+		},
+		{
+			"url": "assets/actor1_05.png",
+			"type": "image",
+			"name": "actor1_05_png"
+		},
+		{
+			"url": "assets/actor1_06.png",
+			"type": "image",
+			"name": "actor1_06_png"
+		},
+		{
+			"url": "assets/Actor1_07.png",
+			"type": "image",
+			"name": "Actor1_07_png"
+		},
+		{
+			"url": "assets/Actor1_08.png",
+			"type": "image",
+			"name": "Actor1_08_png"
+		},
+		{
+			"url": "assets/Actor1_09.png",
+			"type": "image",
+			"name": "Actor1_09_png"
+		},
+		{
+			"url": "assets/Actor1_10.png",
+			"type": "image",
+			"name": "Actor1_10_png"
+		},
+		{
+			"url": "assets/Actor1.jpg",
+			"type": "image",
+			"name": "Actor1_jpg"
+		},
+		{
+			"url": "assets/Balloon_exclamation.png",
+			"type": "image",
+			"name": "Balloon_exclamation_png"
+		},
+		{
+			"url": "assets/Balloon_questionMark.png",
+			"type": "image",
+			"name": "Balloon_questionMark_png"
+		},
+		{
+			"url": "assets/Balloon_exclamation_gray.png",
+			"type": "image",
+			"name": "Balloon_exclamation_gray_png"
+		},
+		{
+			"url": "assets/Balloon_questionMark_gray.png",
+			"type": "image",
+			"name": "Balloon_questionMark_gray_png"
+		},
+		{
+			"url": "assets/empty.png",
+			"type": "image",
+			"name": "empty_png"
+		}
+	]
+}
