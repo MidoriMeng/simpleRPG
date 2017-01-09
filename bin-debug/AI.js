@@ -41,17 +41,32 @@ var AStarSearch = (function () {
         this._path = [];
         this._heuristic = this.diagonal;
         this._straightCost = 1.0;
-        this._diagCost = Math.SQRT2;
+        this._diagCost = 10;
         this._objGrid = objGrid;
         this._creatureGrid = creatureGrid;
+        this._clickedAtUnwalkable = false;
     }
     var d = __define,c=AStarSearch,p=c.prototype;
+    p.setStartNode = function (x, y) {
+        this._objGrid.setStartNode(x, y);
+    };
+    p.setEndNode = function (x, y) {
+        this._objGrid.setEndNode(x, y);
+        this._creatureGrid.setEndNode(x, y);
+    };
     p.search = function () {
         //init
         this._openList = new Array();
         this._closedList = new Array();
         this._startNode = this._objGrid._startNode;
         this._endNode = this._objGrid._endNode;
+        if (!this._endNode.walkSpeed) {
+            this._clickedAtUnwalkable = true;
+            this._endNode.walkSpeed = 1;
+        }
+        if (!this._creatureGrid._endNode.walkSpeed) {
+            this._clickedAtUnwalkable = true;
+        }
         this._startNode.g = 0;
         this._startNode.h = this._heuristic(this._startNode);
         this._startNode.f = this._startNode.g + this._startNode.h;
@@ -132,6 +147,11 @@ var AStarSearch = (function () {
             node = node.parent;
             //console.log(node.x + " "+node.y);
             this._path.push(node); //结尾加入
+        }
+        if (this._clickedAtUnwalkable) {
+            this._endNode.walkSpeed = 0;
+            this._path.splice(0, 1);
+            this._clickedAtUnwalkable = false;
         }
     };
     p.manhattan = function (node) {

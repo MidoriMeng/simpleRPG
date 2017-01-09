@@ -54,19 +54,29 @@ class AStarSearch {
     _openList: TileNode[] = [];
     _closedList: TileNode[] = [];
     _objGrid: Grid;
-    _creatureGrid:Grid;
+    _creatureGrid: Grid;
     _startNode: TileNode;
     _endNode: TileNode;
     _path: TileNode[] = [];
     _heuristic: Function = this.diagonal;
     _straightCost: number = 1.0;
-    _diagCost: number = Math.SQRT2;
+    _diagCost: number = 10;
 
-    constructor(objGrid:Grid,creatureGrid:Grid){
+    _clickedAtUnwalkable: boolean;
+
+    constructor(objGrid: Grid, creatureGrid: Grid) {
         this._objGrid = objGrid;
         this._creatureGrid = creatureGrid;
+        this._clickedAtUnwalkable = false;
     }
 
+    setStartNode(x: number, y: number){
+        this._objGrid.setStartNode(x,y);
+    }
+    setEndNode(x: number, y: number){
+        this._objGrid.setEndNode(x,y);
+        this._creatureGrid.setEndNode(x,y);
+    }
     public search(): Boolean {
         //init
         this._openList = new Array();
@@ -74,11 +84,17 @@ class AStarSearch {
 
         this._startNode = this._objGrid._startNode;
         this._endNode = this._objGrid._endNode;
-
+        if (!this._endNode.walkSpeed) {
+            this._clickedAtUnwalkable = true;
+            this._endNode.walkSpeed = 1;
+        }
+        if (!this._creatureGrid._endNode.walkSpeed) {
+            this._clickedAtUnwalkable = true;
+        }
         this._startNode.g = 0;
         this._startNode.h = this._heuristic(this._startNode);
         this._startNode.f = this._startNode.g + this._startNode.h;
-        
+
         //search
         var currentNode: TileNode = this._startNode;
 
@@ -95,10 +111,10 @@ class AStarSearch {
                 for (var j: number = startY; j <= endY; j++) {
                     var test: TileNode = this._objGrid._nodes[i][j];
                     if (test == currentNode || !test.walkSpeed ||
-                     !this._objGrid._nodes[currentNode.x][test.y].walkSpeed ||
-                      !this._objGrid._nodes[test.x][currentNode.y].walkSpeed)
-                    {   //console.log("index:"+ i + " " +j +" !speed:"+ !test.walkSpeed);
-                        continue; }
+                        !this._objGrid._nodes[currentNode.x][test.y].walkSpeed ||
+                        !this._objGrid._nodes[test.x][currentNode.y].walkSpeed) {   //console.log("index:"+ i + " " +j +" !speed:"+ !test.walkSpeed);
+                        continue;
+                    }
 
                     var cost: number = this._straightCost;
                     if (!((currentNode.x == test.x) || (currentNode.y == test.y))) {
@@ -173,7 +189,6 @@ class AStarSearch {
 
 
     public buildPath(): void {
-
         this._path = new Array();
         var node: TileNode = this._endNode;
         this._path.push(node);
@@ -182,6 +197,11 @@ class AStarSearch {
             node = node.parent;
             //console.log(node.x + " "+node.y);
             this._path.push(node);  //结尾加入
+        }
+        if (this._clickedAtUnwalkable) {
+            this._endNode.walkSpeed = 0;
+            this._path.splice(0, 1);
+            this._clickedAtUnwalkable = false;
         }
     }
 

@@ -6,6 +6,7 @@ interface State {
     onExit();
     name: string;
     context: any;
+    callback: Function;
 }
 /*
 class StateMachine {
@@ -35,12 +36,14 @@ class StateMachine {
 class GameStateMachine {
     stateList: State[] = [];
     time = 0;
-    iI=0;
+    iI = 0;
     constructor() {
         //initialize all state machines
         //this.stateLists[0] =
         //this.curState.onInit();
     }
+
+
     addState(state: State) {
         this.stateList[this.stateList.length] = state;
         state.onInit();
@@ -51,7 +54,7 @@ class GameStateMachine {
         let pass = now - time;
         this.time = now;
         this.iI++;//test
-        
+
         if (this.stateList) {
             for (var index in this.stateList) {
                 this.stateList[index].onRun(pass);

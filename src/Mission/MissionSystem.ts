@@ -1,26 +1,23 @@
 
-//???必须放在开头，为什么？
+
 enum MissionStatus {
+    SUBMITTED,//不显示
     UNACCEPTABLE,//灰叹号
+    DURING,//不显示/灰问号
     ACCEPTABLE,//黄叹号
-    DURING,//不显示/不显示
     SUBMITTABLE,//黄问号
-    SUBMITTED//不显示
 }
 
+
+
 //防御式
-class MissionService implements Observer {
+class MissionService implements EventEmitter{
     private static instance = new MissionService();
     player: Player;
 
     //储存所有任务，待优化
-    private observerList: Array<MissionObserver> = new Array<MissionObserver>();
-    private missionList: missionList = {
-        "00100201": new Mission("00100201", "mission1:welcome", "welcome to egret",
-            MissionStatus.UNACCEPTABLE, Mission.acceptRules("level", 1))
-        //"00200101": new Mission("00200101", "welcome2", "welcome ww", MissionStatus.DURING),
-        //"00200301": new Mission("00200301", "welcome2", "welcome ww", MissionStatus.ACCEPTABLE)
-    };
+    observerList: Array<Observer> = new Array<MissionObserver>();
+    private missionList: missionList;
 
     static getInstance(): MissionService {
         if (MissionService.instance == null)
@@ -28,8 +25,9 @@ class MissionService implements Observer {
         return MissionService.instance;
     }
 
-    /**引用 */
-    onStart() {
+    loadMissions() {
+        this.missionList = {};
+        this.missionList = createMissionsFactory();
     }
 
     getMissionById(missionID: string): Mission {
@@ -47,59 +45,56 @@ class MissionService implements Observer {
         MissionService.instance = this;
     }
 
-
-
     notify(mission: Mission) {
         for (let i in this.observerList) {
             this.observerList[i].onChange(mission);
         }
     }
 
-    addMission(mission: Mission) {
-        this.missionList[mission.id] = mission;
-    }
-
-    toAcceptable(missionID: string, player?: Player): boolean {
+    toAcceptable(missionID: string): boolean {
         var m = this.missionList[missionID];
-        if (m.toAcceptable(player)) {
+        if (m.toAcceptable()) {
             this.notify(m);
             return true;
         }
-        console.error("can't to acceptable");
+        console.error("can't to acceptable" + missionID);
         return false;
     }
 
-    acceptMission(missionID: string, player?: Player) {
+    toAcceptable_all() {
+        for (var index in this.missionList) {
+            this.toAcceptable(index);
+        }
+    }
+    acceptMission(missionID: string): boolean {
         var m = this.missionList[missionID];
         if (m.accept()) {
+            this.toSubmittable(missionID);
             this.notify(m);
             return true;
         }
-        console.error("the mission is not acceptable");
         return false;
     }
 
-    toSubmittable(missionID: string, player?: Player) {
+    toSubmittable(missionID: string): boolean {
         var m = this.missionList[missionID];
-        if (m.toSubmittable(player)) {
+        if (m.toSubmittable()) {
             this.notify(m);
             return true;
         }
-        console.error("the mission is not acceptable");
         return false;
     }
 
-    submitMission(missionID: string, player?: Player) {
+    submitMission(missionID: string, player?: Player): boolean {
         var m = this.missionList[missionID];
         if (m.submit()) {
             this.notify(m);
             return true;
         }
-        console.error("can't submit mission");
         return false;
     }
 
-    addObserver(observer: MissionObserver) {
+    addObserver(observer: Observer) {
         this.observerList.push(observer);
     }
 
@@ -109,40 +104,9 @@ class MissionService implements Observer {
         else
             return false;
     }
-
-    /**更新任务状态 */
-    onChange(player: Player) {
-        for (var id in this.missionList) {
-            var mission = this.missionList[id];
-            if (mission.status == MissionStatus.UNACCEPTABLE) {
-                if (mission.toAcceptable(player))
-                    this.notify(mission);
-            }
-            if (mission.status == MissionStatus.DURING) {
-                if( mission.toSubmittable(player))
-                    this.notify(mission);
-            }
-        }
-    }
-    /*deleteObserver(observer:MissionObserver){
-        this.observerList.
-    }*/
 }
-
-
-
-
 
 type missionList = {
-    [index: string]: Mission
+    [id: string]: Mission
 };
 
-interface MissionObserver extends Observer {
-    onChange(mission: Mission);
-}
-
-
-
-interface Observer {
-    onChange(...a);
-}

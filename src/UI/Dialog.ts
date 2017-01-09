@@ -8,15 +8,26 @@ const DIALOG_INTERVAL = 28;
 /**包含对话和任务 */
 class Dialog extends egret.DisplayObjectContainer {
     component: egret.TextField;
+    strs: string[];
+    curIndex = 0;
     speaker: egret.TextField;
     bg: egret.Shape;
     portrait: egret.Bitmap;
-    missionList: Mission[];
+    type: "mission" | "normal";
+    //todo delete
+    mission: IMissionBO;
+    personID:string;
 
-    public constructor(obj: Dialogable, dialogComponent: string, missions: Mission[]) {
+    /**修改头像，名字 */
+    setSpeaker(speaker: Dialogable) {
+        this.portrait = speaker.portrait;
+        this.speaker.text = speaker.name;
+    }
+    public constructor(obj: Dialogable, dialogComponents: string[], mission: Mission,speakerID:string) {
         super();
-        this.missionList = missions;
-
+        this.touchEnabled = true;
+        this.mission = mission;
+        this.personID=speakerID;
         //背景
         this.bg = new egret.Shape();
         this.bg.graphics.beginFill(0x000000);
@@ -39,9 +50,9 @@ class Dialog extends egret.DisplayObjectContainer {
         this.speaker.y = DIALOG_INTERVAL;
         this.addChild(this.speaker);
         //对话内容
+        this.strs = dialogComponents;
         this.component = new egret.TextField;
-        //this.component.text = dialogComponent;
-        this.component.text = this.missionList[0].name;
+        this.component.text = dialogComponents[this.curIndex];
         this.component.size = DIALOG_SIZE;
         this.component.x = this.speaker.x;
         this.component.y = DIALOG_INTERVAL * 2 + this.speaker.height;
@@ -49,10 +60,13 @@ class Dialog extends egret.DisplayObjectContainer {
         this.component.height = DIALOG_HEIGHT - 3 * DIALOG_INTERVAL - this.speaker.height;
         this.addChild(this.component);
 
-        //mission todo
-        /*var mission = new egret.TextField();
-        mission.text = this.missionList[0].name;
-        this.component.size = DIALOG_SIZE;
-        this.addChild(mission);*/
+    }
+
+    nextDialog(): boolean {
+        if (this.strs.length > this.curIndex + 1) {
+            this.component.text = this.strs[++this.curIndex];
+            return true;
+        }
+        return false;
     }
 }

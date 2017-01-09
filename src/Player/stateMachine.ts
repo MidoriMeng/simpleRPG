@@ -3,7 +3,6 @@ namespace PLAYER {
         context: Player;
         onRun(pass: number);
         onCheck(): PlayerState;
-        name: string;
     }
 
 
@@ -39,9 +38,11 @@ namespace PLAYER {
     export class IdleState implements PlayerState {
         context: Player;
         name = "Idle";
-        public constructor(player: Player) {
+        callback: Function;
+        public constructor(player: Player, callback: Function) {
             this.context = player;
             this.context.curState = this;
+            this.callback = callback;
         }
 
         public onInit() {
@@ -56,7 +57,7 @@ namespace PLAYER {
 
         public onCheck(): PlayerState {
             if (this.context.searchAgent._path.length)
-                return new WalkState(this.context);
+                return new WalkState(this.context, this.callback);
             return this;
         }
 
@@ -64,20 +65,23 @@ namespace PLAYER {
             //console.log("idle exit");
         }
     }
+
     export class WalkState implements PlayerState {
         context: Player;
         targetPosition: Vector2;
         name = "Walk";
-        public constructor(player: Player) {
+        callback: Function;
+        public constructor(player: Player, callback: Function) {
             this.context = player;
             this.context.curState = this;
+            this.callback = callback;
             this.targetPosition = new Vector2(player.x, player.y);
             //console.log("facing left:"+this.player.isLeftFacing);
         }
 
-        //TODO:根据tileNode path生成动作
 
         public onInit() {
+            //console.log("walk init");
             //获取路径第一个点作为移动目标
             var temp = this.context.searchAgent._path.pop();//获取并删除路径第一个节点
             if (temp) {
@@ -98,6 +102,9 @@ namespace PLAYER {
                     Math.abs(this.targetPosition.x - this.context.x) +
                     Math.abs(this.targetPosition.y - this.context.y)) /
                     this.context.velocity));
+            } else {
+                if (this.callback)
+                    this.callback();
             }
         }
 
@@ -112,7 +119,11 @@ namespace PLAYER {
             if (/*!this.context.searchAgent._path.length
                 && */this.context.x == this.targetPosition.x
                 && this.context.y == this.targetPosition.y) {
-                return new IdleState(this.context);
+                if (!this.context.searchAgent._path.length) {
+                    if (this.callback)
+                        this.callback();
+                }
+                return new IdleState(this.context, this.callback);
             } else {
                 return this;
             }
@@ -136,7 +147,6 @@ namespace PLAYER {
         }
     
         public onRun(pass: number) {
-            //TODO:find enemy
         }
     
         public onCheck(): State {

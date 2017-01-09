@@ -1,15 +1,24 @@
-/**一直显示 */
-class MissionPanel extends egret.DisplayObjectContainer implements MissionObserver {
-    missionList: Mission[] = [];
+const MISSIONPANEL_WIDTH = 300;
+const MISSIONPANEL_HEIGHT = 150;
+const LINE_SPACE = 10;
+
+class MissionPanel extends egret.DisplayObjectContainer implements Observer {
+    missionList: IMissionBO[] = [];
+    bg: egret.Shape;
+    textFieldList: egret.TextField[];
     constructor() {
         super();
         var service = MissionService.getInstance();
         service.addObserver(this);
         var missionList = service.getMissionByCustomRule(this.rule_interactable, this);
-        for (var i in this.missionList) {
-            //todo : 生成显示列表
-            console.log("generate " + this.missionList[i].name + " @missionPanel");
-        }
+        this.textFieldList = [];
+
+        this.bg = new egret.Shape();
+        this.bg.graphics.beginFill(0x000000);
+        this.bg.graphics.drawRect(0, 0, MISSIONPANEL_WIDTH, MISSIONPANEL_HEIGHT);
+        this.bg.graphics.endFill();
+        this.bg.alpha = 0.5;
+        this.addChild(this.bg);
     }
 
     /**include  during, submittable */
@@ -21,22 +30,25 @@ class MissionPanel extends egret.DisplayObjectContainer implements MissionObserv
                 self.missionList.push(missions[index]);
             }
         }
+        self.update();
     }
 
     addMission(mission: Mission) {
         if (this.missionList.indexOf(mission) < 0) {
             this.missionList.push(mission);
-            this.updatePanel();
+            this.update();
         }
-        else
+        else {
+            console.log("mission already in missionPanel");
             return;
+        }
     }
 
     deleteMission(mission: Mission) {
         var index = this.missionList.indexOf(mission);
         if (index != -1) {
             this.missionList.splice(index, 1);
-            this.updatePanel();
+            this.update();
         } else
             console.error("nothing to delete");
     }
@@ -47,20 +59,39 @@ class MissionPanel extends egret.DisplayObjectContainer implements MissionObserv
         if (newElement && shouldDisplay)
             this.addMission(mission);
         if (shouldDisplay)
-            this.updatePanel();
+            this.update();
         else if (!newElement && !shouldDisplay)
             this.deleteMission(mission);
     }
 
-    updatePanel() {
+    /**sort list and update view */
+    update() {
+        //sort
         this.missionList.sort(
             function (a, b) {
                 var valueA, valueB;
                 var result = 0;
-                return b.status - a.status +
+                return b.getStatus() - a.getStatus() +
                     0.01 * (Number(b.getFromID()) - Number(a.getFromID()));//降序
             }
         );
-        //show list
+
+        //update view
+        if (this.missionList.length > 0) {
+            this.removeChildren();
+            this.addChild(this.bg);
+            this.textFieldList.splice(0);//delete all
+            for (var index in this.missionList) {
+                var mission = this.missionList[index];
+                var newText = new egret.TextField();
+                newText.text = mission.getName() + " (" + mission.getStatusString() + ")";
+                this.textFieldList.push(newText);
+                newText.x = LINE_SPACE;
+                newText.y = LINE_SPACE + Number(index) * newText.size*1.1;
+                this.addChild(newText);
+            }
+        }
     }
+
+    
 }

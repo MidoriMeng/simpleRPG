@@ -1,29 +1,58 @@
-class Mission {
+interface IMissionBO {
+    getID(): string;
+    getFromID(): string;
+    getToID(): string;
+    getCountID(): string;
+    
+    getName(): string;
+    getDescription(): string[];
+    getStatusString(): string;
+    getStatus(): number;
+}
+
+class Mission implements IMissionBO {
     id: string;
     name: string;
-    description: string;
+    description: string[];
     status: MissionStatus;
-    acceptRule: Function;
-    finishRule: Function;
+    acceptCondition: MissionCondition;
+    submitCondition: MissionCondition;
 
     /**from+to+count，三位+三位+两位 */
     constructor(id: string, name: string,
-        description: string,
-        status: MissionStatus,
-        acceptRule?: Function) {
+        description: string[],
+        acceptCondition: MissionCondition,
+        submitCondition: MissionCondition) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.acceptRule = acceptRule;
-        this.status = status;
+        this.status = MissionStatus.UNACCEPTABLE;
+        this.acceptCondition = acceptCondition;
+        this.submitCondition = submitCondition;
+        var acceptFunc = () => {
+            MissionService.getInstance().toAcceptable(this.id);
+        }
+        if (this.acceptCondition)
+            this.acceptCondition.fatherFunc = acceptFunc;
+        var submitFunc = () => {
+            MissionService.getInstance().toSubmittable(this.id);
+        }
+        if (this.submitCondition)
+            this.submitCondition.fatherFunc = submitFunc;
+
+        //this.toAcceptable();
     }
 
-    toAcceptable(player): boolean {
+    toAcceptable(): boolean {
         if (this.status == MissionStatus.UNACCEPTABLE)
-            if (this.acceptRule(player)) {
+            if (this.acceptCondition) {
+                if (this.acceptCondition.meetDemand()) {
+                    this.status = MissionStatus.ACCEPTABLE;
+                    return true;
+                }
+            } else {
                 this.status = MissionStatus.ACCEPTABLE;
-                return true;
-            }
+                return true;}
         return false;
     }
 
@@ -35,16 +64,17 @@ class Mission {
         return false;
     }
 
-    toSubmittable(player?: Player): boolean {
-        //todo
-        if (this.status == MissionStatus.DURING) {
-            this.status = MissionStatus.SUBMITTABLE;
-            return true;
-        }
-        /*if (this.finishRule(player)) {
-            this.status = MissionStatus.SUBMITTABLE;
-            return true;
-        }*/
+    toSubmittable(): boolean {
+        if (this.status == MissionStatus.DURING)
+            if (this.submitCondition) {
+                if (this.submitCondition.meetDemand()) {
+                    this.status = MissionStatus.SUBMITTABLE;
+                    return true;
+                }
+            } else {
+                this.status = MissionStatus.SUBMITTABLE;
+                return true;
+            }
         return false;
     }
 
@@ -68,18 +98,34 @@ class Mission {
         return this.id.substring(6);
     }
 
-    static acceptRules(rule: "level" | "money", standard: number): Function {
-        var levelRule = (player: Player) => {
-            if (player.level >= standard)
-                return true;
-            return false;
+    getStatusString(): string {
+        switch (this.status) {
+            case MissionStatus.ACCEPTABLE:
+                return "可接受";
+            case MissionStatus.DURING:
+                return "进行中";
+            case MissionStatus.SUBMITTABLE:
+                return "可提交";
+            case MissionStatus.SUBMITTED:
+                return "已提交";
+            case MissionStatus.UNACCEPTABLE:
+                return "不可接受";
+            default:
+                console.error("no such status");
+                return null;
         }
+    }
 
-        switch (rule) {
-            case "level":
-                return levelRule;
-            case "money":
-                break;
-        }
+    getID(): string {
+        return this.id;
+    }
+    getName(): string {
+        return this.name;
+    }
+    getDescription(): string[] {
+        return this.description;
+    }
+    getStatus(): number {
+        return this.status;
     }
 }

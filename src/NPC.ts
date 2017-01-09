@@ -1,22 +1,5 @@
-/*
-class NPC_move extends NPC_stand implements Movable {
-    curAnimation: Animation;
-    animationList;
-    velocity: number;
 
-    constructor(id: string, name: string,
-        appearances: appearance_4, orientation: DIRECTION,
-        portrait: string, 
-        velocity:number, animationList,
-         x?: number, y?: number){
-            super(id,name,appearances,orientation,portrait,x,y);
-            this.animationList = animationList;
-            this.velocity = velocity;
-            this.curAnimation = null;
-    }
-
-}*/
-class NPC_stand extends egret.DisplayObjectContainer implements MissionObserver, Dialogable, Displayable {
+class NPC extends egret.DisplayObjectContainer implements MissionObserver, Dialogable, Displayable {
     id: string;//三位
     name: string;
 
@@ -28,8 +11,8 @@ class NPC_stand extends egret.DisplayObjectContainer implements MissionObserver,
     missionList: Mission[] = [];
     emoji: egret.Bitmap;
 
-    //todo delete
-    dialog;
+    isTalking = false;
+
     /**ID为三位 */
     constructor(id: string, name: string,
         appearances: appearance_4, orientation: DIRECTION,
@@ -52,12 +35,12 @@ class NPC_stand extends egret.DisplayObjectContainer implements MissionObserver,
         //show emoji
         this.emoji = new egret.Bitmap(RES.getRes("empty_png"));
         this.showEmoji();
-        this.emoji.y = -this.emoji.height;
         this.addChild(this.emoji);
 
         //add listener
-        this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.showDialog, this);
+        //this.addListener();
         this.addChild(this.appearance);
+        //this.appearance.touchEnabled = true;
     }
 
     setPosition(pos: Vector2) {
@@ -86,31 +69,45 @@ class NPC_stand extends egret.DisplayObjectContainer implements MissionObserver,
         this.appearance = new egret.Bitmap(this.appearances[str]);
     }
 
+    conversation() {
+        Player.getInstance().Move(machine, new Vector2(this.x, this.y), this.showDialog);
+
+    }
+    /*addListener() {
+        this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.showDialog, this);
+    }*/
+
     showDialog() {
-        console.log("show");
-        this.dialog = new Dialog(this, "blabla", this.missionList);
-        this.addChild(this.dialog);
-        this.dialog.touchEnabled = true;
-        this.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.showDialog, this);
-        this.dialog.addEventListener(egret.TouchEvent.TOUCH_TAP, this.clickDialog, this);
+        UIService.getInstance().displayDialog(new Dialog(this, this.missionList[0].description, this.missionList[0], this.id));
+        //this.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.showDialog, this);
     }
 
-    //todo 挪走
-    clickDialog() {
-        console.log("delete");
-        this.removeEventListener(egret.TouchEvent.TOUCH_TAP, this.clickDialog, this);
-        this.removeChild(this.dialog);
-        delete (this.dialog);
-        /**来不及了只能这么写了orz */
-        if (this.id == "001"){
-            MissionService.getInstance().acceptMission("00100201");
-            MissionService.getInstance().toSubmittable("00100201");
+    static rule(rule: "interactableFirst" | "all", missions: missionList, self: NPC) {
+        var all = () => {
+            for (var index in missions) {
+                //var pattern = new RegExp(this.id, "\d{3}");
+                var fromId = missions[index].getFromID();
+                var toId = missions[index].getToID();
+                if (self.id == fromId || self.id == toId) {
+                    self.missionList.push(missions[index]);
+                }
+            }
         }
-        if (this.id == "002")
-            MissionService.getInstance().submitMission("00100201");
+        var interactableFirst = () => {
+            self.rule_all(missions, self);
+            self.sort();
+        }
+        switch (rule) {
+            case "interactableFirst":
+                interactableFirst();
+                break;
+            case "all":
+                all();
+                break;
+        }
     }
     /**把所有收/发人是自己的任务加到自己的队列中 */
-    rule_all(missions: missionList, self: NPC_stand) {
+    rule_all(missions: missionList, self: NPC) {
         for (var index in missions) {
             //var pattern = new RegExp(this.id, "\d{3}");
             var fromId = missions[index].getFromID();
@@ -121,14 +118,9 @@ class NPC_stand extends egret.DisplayObjectContainer implements MissionObserver,
         }
     }
 
-    rule_all_interactableFirst(missions: missionList, self: NPC_stand) {
+    rule_all_interactableFirst(missions: missionList, self: NPC) {
         self.rule_all(missions, self);
-        self.missionList.sort(function (a, b) {
-            var valueA, valueB;
-            var result = 0;
-            return b.status - a.status +
-                0.01 * (Number(b.getFromID()) - Number(a.getFromID()));//降序
-        });
+        self.sort();
     }
 
     onChange(mission: Mission) {
@@ -141,13 +133,25 @@ class NPC_stand extends egret.DisplayObjectContainer implements MissionObserver,
     }
 
     sort() {
+        var id = this.id;
         this.missionList.sort(function (a, b) {
             var valueA, valueB;
-            var result = 0;
-            return b.status - a.status +
-                0.01 * (Number(b.getFromID()) - Number(a.getFromID()));//降序
+            valueB = (
+                !b.status
+                    || (!(b.status % 2) && b.getFromID() == id)
+                    || (b.status % 2 && b.getToID() == id) ?
+                    0 : b.status
+            )
+            valueA = (
+                !a.status
+                    || (!(a.status % 2) && a.getFromID() == id)
+                    || (a.status % 2 && a.getToID() == id) ?
+                    0 : a.status
+            )
+            return valueB - valueA;
         });
     }
+
     showEmoji() {
         if (this.missionList.length) {
             var fromID = this.missionList[0].getFromID();

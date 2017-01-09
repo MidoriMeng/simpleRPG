@@ -29,10 +29,11 @@ var PLAYER;
         }
     }*/
     var IdleState = (function () {
-        function IdleState(player) {
+        function IdleState(player, callback) {
             this.name = "Idle";
             this.context = player;
             this.context.curState = this;
+            this.callback = callback;
         }
         var d = __define,c=IdleState,p=c.prototype;
         p.onInit = function () {
@@ -44,7 +45,7 @@ var PLAYER;
         };
         p.onCheck = function () {
             if (this.context.searchAgent._path.length)
-                return new WalkState(this.context);
+                return new WalkState(this.context, this.callback);
             return this;
         };
         p.onExit = function () {
@@ -55,16 +56,17 @@ var PLAYER;
     PLAYER.IdleState = IdleState;
     egret.registerClass(IdleState,'PLAYER.IdleState',["PLAYER.PlayerState","State"]);
     var WalkState = (function () {
-        function WalkState(player) {
+        function WalkState(player, callback) {
             this.name = "Walk";
             this.context = player;
             this.context.curState = this;
+            this.callback = callback;
             this.targetPosition = new Vector2(player.x, player.y);
             //console.log("facing left:"+this.player.isLeftFacing);
         }
         var d = __define,c=WalkState,p=c.prototype;
-        //TODO:根据tileNode path生成动作
         p.onInit = function () {
+            //console.log("walk init");
             //获取路径第一个点作为移动目标
             var temp = this.context.searchAgent._path.pop(); //获取并删除路径第一个节点
             if (temp) {
@@ -84,6 +86,10 @@ var PLAYER;
                     Math.abs(this.targetPosition.y - this.context.y)) /
                     this.context.velocity));
             }
+            else {
+                if (this.callback)
+                    this.callback();
+            }
         };
         p.onRun = function (pass) {
             //console.log("walk onRun");
@@ -93,7 +99,11 @@ var PLAYER;
             //console.log("walk onCheck");
             if (this.context.x == this.targetPosition.x
                 && this.context.y == this.targetPosition.y) {
-                return new IdleState(this.context);
+                if (!this.context.searchAgent._path.length) {
+                    if (this.callback)
+                        this.callback();
+                }
+                return new IdleState(this.context, this.callback);
             }
             else {
                 return this;

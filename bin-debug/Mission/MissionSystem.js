@@ -1,20 +1,16 @@
-//???必须放在开头，为什么？
 var MissionStatus;
 (function (MissionStatus) {
-    MissionStatus[MissionStatus["UNACCEPTABLE"] = 0] = "UNACCEPTABLE";
-    MissionStatus[MissionStatus["ACCEPTABLE"] = 1] = "ACCEPTABLE";
+    MissionStatus[MissionStatus["SUBMITTED"] = 0] = "SUBMITTED";
+    MissionStatus[MissionStatus["UNACCEPTABLE"] = 1] = "UNACCEPTABLE";
     MissionStatus[MissionStatus["DURING"] = 2] = "DURING";
-    MissionStatus[MissionStatus["SUBMITTABLE"] = 3] = "SUBMITTABLE";
-    MissionStatus[MissionStatus["SUBMITTED"] = 4] = "SUBMITTED"; //不显示
+    MissionStatus[MissionStatus["ACCEPTABLE"] = 3] = "ACCEPTABLE";
+    MissionStatus[MissionStatus["SUBMITTABLE"] = 4] = "SUBMITTABLE";
 })(MissionStatus || (MissionStatus = {}));
 //防御式
 var MissionService = (function () {
     function MissionService() {
         //储存所有任务，待优化
         this.observerList = new Array();
-        this.missionList = {
-            "00100201": new Mission("00100201", "mission1:welcome", "welcome to egret", MissionStatus.UNACCEPTABLE, Mission.acceptRules("level", 1))
-        };
         //init all missions
         if (MissionService.instance)
             throw new Error("don't use constructor of MissionSystem");
@@ -26,8 +22,9 @@ var MissionService = (function () {
             MissionService.instance = new MissionService();
         return MissionService.instance;
     };
-    /**引用 */
-    p.onStart = function () {
+    p.loadMissions = function () {
+        this.missionList = {};
+        this.missionList = createMissionsFactory();
     };
     p.getMissionById = function (missionID) {
         return this.missionList[missionID];
@@ -40,34 +37,35 @@ var MissionService = (function () {
             this.observerList[i].onChange(mission);
         }
     };
-    p.addMission = function (mission) {
-        this.missionList[mission.id] = mission;
-    };
-    p.toAcceptable = function (missionID, player) {
+    p.toAcceptable = function (missionID) {
         var m = this.missionList[missionID];
-        if (m.toAcceptable(player)) {
+        if (m.toAcceptable()) {
             this.notify(m);
             return true;
         }
-        console.error("can't to acceptable");
+        console.error("can't to acceptable" + missionID);
         return false;
     };
-    p.acceptMission = function (missionID, player) {
+    p.toAcceptable_all = function () {
+        for (var index in this.missionList) {
+            this.toAcceptable(index);
+        }
+    };
+    p.acceptMission = function (missionID) {
         var m = this.missionList[missionID];
         if (m.accept()) {
+            this.toSubmittable(missionID);
             this.notify(m);
             return true;
         }
-        console.error("the mission is not acceptable");
         return false;
     };
-    p.toSubmittable = function (missionID, player) {
+    p.toSubmittable = function (missionID) {
         var m = this.missionList[missionID];
-        if (m.toSubmittable(player)) {
+        if (m.toSubmittable()) {
             this.notify(m);
             return true;
         }
-        console.error("the mission is not acceptable");
         return false;
     };
     p.submitMission = function (missionID, player) {
@@ -76,7 +74,6 @@ var MissionService = (function () {
             this.notify(m);
             return true;
         }
-        console.error("can't submit mission");
         return false;
     };
     p.addObserver = function (observer) {
@@ -88,22 +85,8 @@ var MissionService = (function () {
         else
             return false;
     };
-    /**更新任务状态 */
-    p.onChange = function (player) {
-        for (var id in this.missionList) {
-            var mission = this.missionList[id];
-            if (mission.status == MissionStatus.UNACCEPTABLE) {
-                if (mission.toAcceptable(player))
-                    this.notify(mission);
-            }
-            if (mission.status == MissionStatus.DURING) {
-                if (mission.toSubmittable(player))
-                    this.notify(mission);
-            }
-        }
-    };
     MissionService.instance = new MissionService();
     return MissionService;
 }());
-egret.registerClass(MissionService,'MissionService',["Observer"]);
+egret.registerClass(MissionService,'MissionService',["EventEmitter"]);
 //# sourceMappingURL=MissionSystem.js.map

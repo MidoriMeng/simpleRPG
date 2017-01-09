@@ -15,8 +15,8 @@ namespace MAP {
 
         objGrid: Grid;
         creatureGrid: Grid;
-        npcList: NPC_stand[];
-        constructor(data: ITileMap, npcs: NPC_stand[]) {
+        npcList: NPC[];
+        constructor(data: ITileMap, npcs: NPC[]) {
             super();
             this.objGrid = new Grid();
             this.type = data.type;
