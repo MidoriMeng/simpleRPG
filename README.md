@@ -1,3 +1,6 @@
-##没有解决的问题 11.10 第十周
-- 尝试先写业务再完善实现，感觉写的时候只能考虑到最简单、直接的，根本没空考虑是否符合防御式编程、数据单向流动、MVC等等。可能还需要积累经验吧。
-- 像个程序员一样思考！
+#Player
+![Player](http://i1.piimg.com/1949/1bb33c98281d8952.png)
+#MissionSystem
+![MissionSystem](http://i1.piimg.com/1949/d9f5a8a31b080bd6.png)
+#UserPanel
+![UserPanel](http://i1.piimg.com/1949/29c5bdd881dc379c.png)
