@@ -12,7 +12,7 @@ class Player extends egret.DisplayObjectContainer implements EventEmitter {
     level = 1;
     hp = 200;
     appearance: egret.Bitmap;
-    curAnimation: Animation;
+    curAnimation: PlayerAnimation;
     orientation: DIRECTION;
     animationList;
     curState: PLAYER.PlayerState;
@@ -66,7 +66,7 @@ class Player extends egret.DisplayObjectContainer implements EventEmitter {
             "walk_north": ["Actor1_11_png", "Actor1_12_png", "Actor1_13_png", "Actor1_12_png"],
             "walk_south": ["Actor1_01_png", "Actor1_02_png", "Actor1_03_png", "Actor1_02_png"]
         };
-        this.curAnimation = new Animation(this
+        this.curAnimation = new PlayerAnimation(this
             .animationList["idle_east"],
             this.appearance, ANIMATION_FRAMESPEED);
         //this.observerList = new Array<Observer>();
@@ -123,25 +123,25 @@ class Player extends egret.DisplayObjectContainer implements EventEmitter {
     updateOrientation(target: Vector2) {
         if (target.x - this.x > 0) {
             this.orientation = DIRECTION.EAST;
-            this.curAnimation = new Animation(this
+            this.curAnimation = new PlayerAnimation(this
                 .animationList["idle_east"],
                 this.appearance, ANIMATION_FRAMESPEED);
         }
         else if (target.x - this.x < 0) {
             this.orientation = DIRECTION.WEST;
-            this.curAnimation = new Animation(this
+            this.curAnimation = new PlayerAnimation(this
                 .animationList["idle_west"],
                 this.appearance, ANIMATION_FRAMESPEED);
         }
         if (target.y - this.y > 0) {
             this.orientation = DIRECTION.SOUTH;
-            this.curAnimation = new Animation(this
+            this.curAnimation = new PlayerAnimation(this
                 .animationList["idle_south"],
                 this.appearance, ANIMATION_FRAMESPEED);
         }
         else if (target.y - this.y < 0) {
             this.orientation = DIRECTION.NORTH;
-            this.curAnimation = new Animation(this
+            this.curAnimation = new PlayerAnimation(this
                 .animationList["idle_north"],
                 this.appearance, ANIMATION_FRAMESPEED);
         }
@@ -150,22 +150,22 @@ class Player extends egret.DisplayObjectContainer implements EventEmitter {
     updateWalkAnimationClip() {
         switch (this.orientation) {
             case DIRECTION.NORTH:
-                this.curAnimation = new Animation(this
+                this.curAnimation = new PlayerAnimation(this
                     .animationList["walk_north"],
                     this.appearance, ANIMATION_FRAMESPEED);
                 break;
             case DIRECTION.EAST:
-                this.curAnimation = new Animation(this
+                this.curAnimation = new PlayerAnimation(this
                     .animationList["walk_east"],
                     this.appearance, ANIMATION_FRAMESPEED);
                 break;
             case DIRECTION.SOUTH:
-                this.curAnimation = new Animation(this
+                this.curAnimation = new PlayerAnimation(this
                     .animationList["walk_south"],
                     this.appearance, ANIMATION_FRAMESPEED);
                 break;
             case DIRECTION.WEST:
-                this.curAnimation = new Animation(this
+                this.curAnimation = new PlayerAnimation(this
                     .animationList["walk_west"],
                     this.appearance, ANIMATION_FRAMESPEED);
                 break;

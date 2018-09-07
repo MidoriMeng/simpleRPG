@@ -1,6 +1,4 @@
 namespace MAP {
-    /**所有地图的信息 */
-
     /**所有图块的信息 */
     export var tileJson = [
         //outside
@@ -21,14 +19,15 @@ namespace MAP {
         //other kinds of scenes
     ]
 
+    /**所有地图的信息 */
     export var tilemapJson = [
         //maps whose SCENE_TYPE is outside
         [
             //first map of "outside"
             {
                 type: SCENE_TYPE.outside,
-                background: [
-                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],//草地
+                background: [//草地
+                    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -39,7 +38,7 @@ namespace MAP {
                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
                     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
                     ],
-                objects: [
+                objects: [//障碍物
                     [1, 0, 1, 1, 1, 1, 1, 1, 1, 1],
                     [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
                     [1, 1, 1, 1, 1, 1, 1, 1, 0, 1],

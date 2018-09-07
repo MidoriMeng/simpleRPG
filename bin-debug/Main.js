@@ -102,7 +102,7 @@ var Main = (function (_super) {
         l.cancel();
         l.addCommand(new WalkCommand(281, 280));
         l.addCommand(new TalkCommand("001"));
-        l.addCommand(new WalkCommand(430, 432));
+        l.addCommand(new WalkCommand(430, 430));
         l.addCommand(new TalkCommand("002"));
         l.addCommand(new TalkCommand("002"));
         l.addCommand(new TalkCommand("002"));

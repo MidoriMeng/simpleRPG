@@ -1,4 +1,4 @@
-class Animation{
+class PlayerAnimation{
     timePassed:number;
     FPS:number=24;
     textureList=[];
