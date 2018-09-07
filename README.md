@@ -1,6 +1,6 @@
 simpleRPG是大三上学期的作业，使用egret引擎创作，是一款H5游戏。玩家可以接取和完成任务，打怪，升级，查看装备与技能，自动游戏。  
 # 体验    
-[在线体验](https://github.com/MidoriMeng/simpleRPG/blob/master/index.html)  
+[在线体验](https://midorimeng.github.io/simpleRPG/)  
 ![截图1](https://github.com/MidoriMeng/simpleRPG/blob/master/images_for_presentation/0.png)  
 ![截图2](https://github.com/MidoriMeng/simpleRPG/blob/master/images_for_presentation/1.png)  
 ![截图3](https://github.com/MidoriMeng/simpleRPG/blob/master/images_for_presentation/2.png)  
