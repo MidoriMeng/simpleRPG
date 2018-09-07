@@ -1,6 +1,5 @@
 var MAP;
 (function (MAP) {
-    /**所有地图的信息 */
     /**所有图块的信息 */
     MAP.tileJson = [
         //outside
@@ -17,6 +16,7 @@ var MAP;
             ]
         ]
     ];
+    /**所有地图的信息 */
     MAP.tilemapJson = [
         //maps whose SCENE_TYPE is outside
         [

@@ -1,5 +1,5 @@
-var Animation = (function () {
-    function Animation(anim, self, FPS) {
+var PlayerAnimation = (function () {
+    function PlayerAnimation(anim, self, FPS) {
         if (FPS === void 0) { FPS = 24; }
         this.FPS = 24;
         this.textureList = [];
@@ -10,7 +10,7 @@ var Animation = (function () {
         this.curFrame = 0;
         //    console.log("new animation,"+anim[0]);
     }
-    var d = __define,c=Animation,p=c.prototype;
+    var d = __define,c=PlayerAnimation,p=c.prototype;
     p.playCurcularly = function (timePassed) {
         this.timePassed += timePassed;
         if (this.timePassed >= 1000 / this.FPS) {
@@ -30,7 +30,7 @@ var Animation = (function () {
             }
         }
     };
-    return Animation;
+    return PlayerAnimation;
 }());
-egret.registerClass(Animation,'Animation');
+egret.registerClass(PlayerAnimation,'PlayerAnimation');
 //# sourceMappingURL=Animation.js.map

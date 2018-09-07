@@ -16,7 +16,7 @@ interface Displayable {
 }
 
 interface Movable extends Displayable {
-    curAnimation: Animation;
+    curAnimation: PlayerAnimation;
     animationList;
     velocity: number;
 }
